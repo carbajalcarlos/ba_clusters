@@ -119,13 +119,13 @@ bm_bcp_art <- biblioNetwork(M = bm, analysis = "coupling", network = "references
 set.seed(69)
 networkPlot(NetMatrix = bm_bcp_art, normalize = "salton",
             weighted = TRUE, n = 40, Title = "Article's coupuling",
-            type = "circle", size = TRUE, remove.multiple = TRUE, edgesize = 5) 
+            type = "kamada", size = TRUE, remove.multiple = TRUE, edgesize = 5) 
 ## Coupuling authors
 bm_bcp_aut <- biblioNetwork(M = bm, analysis = "coupling", network = "authors", ";")
 set.seed(69)
 networkPlot(NetMatrix = bm_bcp_aut, normalize = "salton",
-            weighted = TRUE, n = 20, Title = "Author's coupuling",
-            type = "fruchterman", size = TRUE, remove.multiple = TRUE)
+            weighted = TRUE, n = 40, Title = "Author's coupuling",
+            type = "fruchterman", size = TRUE, remove.multiple = TRUE, edgesize = 5)
 ## Coupuling journals
 bm_bcp_jou <- biblioNetwork(M = bm, analysis = "coupling", network = "sources", ";")
 set.seed(69)
@@ -143,21 +143,21 @@ networkPlot(NetMatrix = bm_bcp_cou, normalize = "salton",
 ## Co-citation articles
 bm_bcc_art <- biblioNetwork(M = bm, analysis = "co-citation", network = "references", ";")
 set.seed(69)
-networkPlot(NetMatrix = bm_bcc_art, n = 30, Title = "Article's co-citation network",
-            type = "fruchterman", size = TRUE, remove.multiple = TRUE, 
-            labelsize = 0.8, edgesize = 2)
+networkPlot(NetMatrix = bm_bcc_art, n = 100, Title = "Article's co-citation network", degree = 2,
+            type = "kamada", size = TRUE, remove.multiple = TRUE, 
+            labelsize = 0.8, edgesize = 5, cluster = "lovain")
 ## Co-citation authors
 bm_bcc_aut <- biblioNetwork(M = bm, analysis = "co-citation", network = "authors", ";")
 set.seed(69)
-networkPlot(NetMatrix = bm_bcc_aut, n = 20, Title = "Author's co-citation network",
-            type = "fruchterman", size = TRUE, remove.multiple = TRUE, 
-            labelsize = 0.8, edgesize = 2)
+networkPlot(NetMatrix = bm_bcc_aut, n = 50, Title = "Author's co-citation network",
+            type = "kamada", size = TRUE, remove.multiple = TRUE, 
+            labelsize = 0.8, edgesize = 2, remove.isolates = TRUE)
 ## Co-citation journals
 bm_bcc_jou <- biblioNetwork(M = bm, analysis = "co-citation", network = "sources", ";")
 set.seed(69)
 networkPlot(NetMatrix = bm_bcc_jou, n = 20, Title = "Author's co-citation network",
             type = "fruchterman", size = TRUE, remove.multiple = TRUE, 
-            labelsize = 0.8, edgesize = 2)
+            labelsize = 0.8, edgesize = 2, remove.isolates = TRUE)
 
 # Bibliographic collaboration
 # Author's collaboration
@@ -181,20 +181,21 @@ networkPlot(NetMatrix = bm_bcl_cou, n = dim(bm_bcl_cou)[1], Title = "University'
 
 # Co-occurrences analysis
 ## Aggregator's keywords
-bm_coc_dkw <- biblioNetwork(M = bm, analysis = "co-occurrences", network = "keywords", ";")
-set.seed(75)
-networkPlot(NetMatrix = bm_coc_dkw, normalize = "association", weighted = TRUE, n = 25,
+#bm_coc_dkw <- biblioNetwork(M = bm, analysis = "co-occurrences", network = "keywords", ";")
+set.seed(69)
+networkPlot(NetMatrix = bm_coc_dkw, normalize = "association", weighted = TRUE, n = 16,
             Title = "Aggregators's keywords co-ocurrences",
             remove.multiple = TRUE, remove.isolates = TRUE, halo = TRUE,
-            type = "fruchterman", size = TRUE, labelsize = .75, edgesize = 2.5)
+            type = "kamada", size = TRUE, labelsize = .75, edgesize = 2.5)
 ## Authors's keywords
-bm_coc_akw <- biblioNetwork(M = bm, analysis = "co-occurrences", network = "author_keywords", ";")
-set.seed(75)
+#bm_coc_akw <- biblioNetwork(M = bm, analysis = "co-occurrences", network = "author_keywords", ";")
+set.seed(69)
 networkPlot(NetMatrix = bm_coc_akw, normalize = "association", weighted = TRUE, n = 16,
             Title = "Author's keywords co-ocurrences",
             remove.multiple = TRUE, remove.isolates = TRUE, halo = TRUE,
             curved = FALSE, cluster = "walktrap",
-            type = "circle", size = TRUE, labelsize = 0.75, edgesize = 3)
+            type = "auto", size = TRUE, labelsize = 0.75, edgesize = 3)
+
 ## Subject category
 ### masking the subject category under  author's keywords
 bm2 <- bm
@@ -203,25 +204,30 @@ index.sc <- which(names(bm2) == "SC")
 names(bm2)[index.akw] <- "DE2"
 names(bm2)[index.sc] <- "DE"
 ### masked extraction
-bm_coc_sc <- biblioNetwork(M = bm2, analysis = "co-occurrences", network = "author_keywords", ";")
-set.seed(69)
-networkPlot(NetMatrix = bm_coc_sc, normalize = "association", weighted = TRUE, n = 24,
+#bm_coc_sc <- biblioNetwork(M = bm2, analysis = "co-occurrences", network = "author_keywords", ";")
+set.seed(72)
+networkPlot(NetMatrix = bm_coc_sc, normalize = "association", weighted = TRUE, n = 20,
             Title = "Subject categories's co-ocurrences",
             remove.multiple = TRUE, remove.isolates = TRUE, halo = TRUE,
             curved = FALSE, cluster = "walktrap",
-            type = "fruchterman", size = TRUE, labelsize = .75, edgesize = 2.5)
+            type = "auto", size = TRUE, labelsize = 1, edgesize = 2.5)
 
 # Co-word analisis
-bm_cst <- conceptualStructure(M = bm, field = "TI",
-                              method = "MCA", stemming = TRUE,
-                              labelsize = 10, documents = 15)
+# bm_cst <- conceptualStructure(M = bm, field = "TI",
+#                               method = "MCA", stemming = TRUE,
+#                               labelsize = 10, documents = 15)
 
 #Historical co-citation network
-bm_hcc <- histNetwork(M = bm, n = 30, sep = ";")
-set.seed(9)
-histPlot(histResults = bm_hcc, size = FALSE,
-         remove.isolates = TRUE,
-         label = TRUE, arrowsize = 0.5, labelsize = 0.75)
+bm_hcc <- histNetwork(M = bm, sep = ";")
+set.seed(69)
+bm_hcc_plot <- histPlot(histResults = bm_hcc, color = TRUE, size = TRUE,
+                        arrowsize = .1, labelsize = 2, size.cex = TRUE, n = 16, edgesize = .5)
+set.seed(69)
+bm_hcc_plot <- histPlot(histResults = bm_hcc, color = TRUE, size = TRUE,
+                        arrowsize = .1, labelsize = 2, size.cex = TRUE, n = 20, edgesize = .5)
+set.seed(69)
+bm_hcc_plot <- histPlot(histResults = bm_hcc, color = TRUE, size = TRUE,
+                        arrowsize = .1, labelsize = 4, size.cex = TRUE, n = 22, edgesize = 1)
 
 # ----- Cleaning -----
 # Removing unwanted publications
