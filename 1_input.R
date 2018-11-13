@@ -44,7 +44,7 @@ bm_dom
 
 # Calculating the authors h-index
 ## One author: 
-bm_hin_yoo <- Hindex(M = bm, authors = "AMIT R", sep = ";", years = 10)
+bm_hin_yoo <- Hindex(M = bm, authors = "WU D", sep = ";", years = 10)
 bm_hin_yoo$H
 bm_hin_yoo$CitationList
 ## One author:  
@@ -78,7 +78,7 @@ legend(x = "topright",  lty = c(1,1,1), cex = 1, bty = "n",
 
 # Bibliometric matrices
 #names(bm)
-#bm$SO[3] # Used to define the appropriated separatord fiels
+#bm$SO[50] # Used to define the appropriated separatord fiels
 ## Printing the 12 most productive journals
 bm_cma_jou <- cocMatrix(M = bm, Field = "SO", sep = ";")
 sort(Matrix::colSums(bm_cma_jou), decreasing = TRUE)[1:12]
@@ -93,7 +93,7 @@ bm <- metaTagExtraction(M = bm, Field = "AU_CO", sep = ";")
 bm_cma_cou <- cocMatrix(M = bm, Field = "AU_CO", sep = ";")
 sort(Matrix::colSums(bm_cma_cou), decreasing = TRUE)[1:12] # Printing the 12 most productive articles
 ## Printing the 12 most cited references
-bm_cma_ctr <- cocMatrix(M = bm, Field = "CR", sep = ";")
+bm_cma_ctr <- cocMatrix(M = bm, Field = "CR", sep = ".  ")
 sort(Matrix::colSums(bm_cma_ctr), decreasing = TRUE)[1:12] # Printing the 12 most productive articles
 ## Printing the 12 most cited first author
 bm <- metaTagExtraction(M = bm, Field = "CR_AU", sep = ";")
@@ -118,7 +118,7 @@ sort(Matrix::colSums(bm_cma_dsc), decreasing = TRUE)[1:12] # Printing the 12 mos
 bm_bcp_art <- biblioNetwork(M = bm, analysis = "coupling", network = "references", ";")
 set.seed(69)
 networkPlot(NetMatrix = bm_bcp_art, normalize = "salton",
-            weighted = TRUE, n = 40, Title = "Article's coupuling",
+            weighted = TRUE, n = 5, Title = "Article's coupuling",
             type = "kamada", size = TRUE, remove.multiple = TRUE, edgesize = 5) 
 ## Coupuling authors
 bm_bcp_aut <- biblioNetwork(M = bm, analysis = "coupling", network = "authors", ";")
@@ -181,14 +181,14 @@ networkPlot(NetMatrix = bm_bcl_cou, n = dim(bm_bcl_cou)[1], Title = "University'
 
 # Co-occurrences analysis
 ## Aggregator's keywords
-#bm_coc_dkw <- biblioNetwork(M = bm, analysis = "co-occurrences", network = "keywords", ";")
+bm_coc_dkw <- biblioNetwork(M = bm, analysis = "co-occurrences", network = "keywords", ";")
 set.seed(69)
 networkPlot(NetMatrix = bm_coc_dkw, normalize = "association", weighted = TRUE, n = 16,
             Title = "Aggregators's keywords co-ocurrences",
             remove.multiple = TRUE, remove.isolates = TRUE, halo = TRUE,
             type = "kamada", size = TRUE, labelsize = .75, edgesize = 2.5)
 ## Authors's keywords
-#bm_coc_akw <- biblioNetwork(M = bm, analysis = "co-occurrences", network = "author_keywords", ";")
+bm_coc_akw <- biblioNetwork(M = bm, analysis = "co-occurrences", network = "author_keywords", ";")
 set.seed(69)
 networkPlot(NetMatrix = bm_coc_akw, normalize = "association", weighted = TRUE, n = 16,
             Title = "Author's keywords co-ocurrences",
@@ -204,24 +204,24 @@ index.sc <- which(names(bm2) == "SC")
 names(bm2)[index.akw] <- "DE2"
 names(bm2)[index.sc] <- "DE"
 ### masked extraction
-#bm_coc_sc <- biblioNetwork(M = bm2, analysis = "co-occurrences", network = "author_keywords", ";")
+bm_coc_sc <- biblioNetwork(M = bm2, analysis = "co-occurrences", network = "author_keywords", ";")
 set.seed(72)
-networkPlot(NetMatrix = bm_coc_sc, normalize = "association", weighted = TRUE, n = 20,
+networkPlot(NetMatrix = bm_coc_sc, normalize = "association", weighted = TRUE, n = 12,
             Title = "Subject categories's co-ocurrences",
             remove.multiple = TRUE, remove.isolates = TRUE, halo = TRUE,
             curved = FALSE, cluster = "walktrap",
             type = "auto", size = TRUE, labelsize = 1, edgesize = 2.5)
 
 # Co-word analisis
-# bm_cst <- conceptualStructure(M = bm, field = "TI",
-#                               method = "MCA", stemming = TRUE,
-#                               labelsize = 10, documents = 15)
+ bm_cst <- conceptualStructure(M = bm, field = "TI",
+                               method = "MCA", stemming = TRUE,
+                               labelsize = 10, documents = 15)
 
 #Historical co-citation network
 bm_hcc <- histNetwork(M = bm, sep = ";")
 set.seed(69)
 bm_hcc_plot <- histPlot(histResults = bm_hcc, color = TRUE, size = TRUE,
-                        arrowsize = .1, labelsize = 2, size.cex = TRUE, n = 16, edgesize = .5)
+                        arrowsize = .1, labelsize = 2, size.cex = TRUE, n = 20, edgesize = .5)
 set.seed(69)
 bm_hcc_plot <- histPlot(histResults = bm_hcc, color = TRUE, size = TRUE,
                         arrowsize = .1, labelsize = 2, size.cex = TRUE, n = 20, edgesize = .5)
