@@ -1,6 +1,7 @@
 # ----- Initialisation -----
 # Loading required libraries
 require(bibliometrix)
+require(stringdist)
 
 # Manual reading of the codes
 ## Selection of data folder
@@ -46,7 +47,30 @@ if (length(index) > 0) {
 }
 
 ### Removing duplicates
-index <- duplicated(x = bm$TI)
-bm <- bm[!index, ]
+bm <- duplicatedMatching(M = bm, Field = "TI", tol = 0.95)
+bm <- bm[order(bm$TI),]
+comparison <- stringdistmatrix(a = bm$TI, b = bm$TI, method = "jw")
+comparison <- data.frame(which(comparison < 0.20, arr.ind = TRUE))
+comparison <- subset(x = comparison, subset = !(row == col))
+comparison <- comparison[order(comparison$row), ]
+comparison$group <- 0
+comparison$name.a <- bm$AU[comparison$row]
+comparison$name.b <- bm$AU[comparison$col]
+comparison$std <- stringdist(a = comparison$name.a, b = comparison$name.b, method = "jw")
+comparison <- subset(x = comparison, subset = std < 0.2)
+for (i in 2:nrow(comparison)) {
+  comparison$group[i] <- comparison$row[i] - comparison$row[i-1]
+}
+comparison <- subset(x = comparison, subset = group != 1)
 
-temp <- duplicatedMatching(M = bm, Field = "TI", tol = 0.20)
+comparison$abl.a <- nchar(bm$AB[comparison$row])
+comparison$abl.b <- nchar(bm$AB[comparison$col])
+comparison$size <- comparison$abl.a - comparison$abl.b
+comparison$del <- comparison$row
+index <- comparison$size > 1
+comparison$del[index] <- comparison$col[index]
+index <- comparison$del
+# Removing duplicates identified
+temp <- bm[-index, ]
+# Reduction to only one value without multiple parameter selection
+
