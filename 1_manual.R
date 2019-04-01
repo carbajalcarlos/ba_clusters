@@ -90,10 +90,6 @@ bm$DE_TM[index] <- NA
 index <- grep(pattern = "^NA$", x = bm$ID_TM, ignore.case = TRUE)
 bm$DE_TM[index] <- NA
 
-## Visualisation of the terms extracted
-# lista <- trimws(unlist(strsplit(na.omit(bm.pre$AB_TM), split = ";")), which = "both")
-# lista <- data.frame(table(lista))
-
 # ===== Closing project =====
 # Removing temporary objects
 rm(files)
@@ -111,11 +107,64 @@ save(list = "bm", file = paste(c("1_process/", directory, "_bm.RData"), collapse
 write.xlsx(x = bm, file = paste(c("1_process/", directory, "_bm.xlsx"), collapse = ""),
            sheetName="Sheet1", col.names=TRUE, row.names=TRUE, append=FALSE, showNA=FALSE)
 
-# Adopting strategies
+# ===== Adopting strategies =====
 M <- bm
+# Stemming abstracts
 M$AB_RAW <- M$AB
 M$AB <- gsub(pattern = ";", replacement = " ", x = M$AB_TM)
+# Removing keywords plus
+M$ID_RAW <- M$ID
+# Internet of things
+# index <- grep(pattern = "^INTERNET OF THING", x = M$ID, ignore.case = TRUE)
+# M$ID[index] <- trimws(gsub(pattern = "^INTERNET OF THING[^;]*;",
+#                            replacement = "", x = M$ID[index]), which = "both")
+# index <- grep(pattern = ";.*INTERNET OF THING[^;]", x = M$ID, ignore.case = TRUE)
+# M$ID[index] <- trimws(gsub(pattern = ";[^;]*INTERNET OF THING[^;]*",
+#             replacement = "", x = M$ID[index]), which = "both")
+# Industry 4
+index <- grep(pattern = "^INDUSTRY 4.0", x = M$ID, ignore.case = TRUE)
+M$ID[index] <- trimws(gsub(pattern = "^INDUSTRY 4.0[^;]*;",
+                           replacement = "", x = M$ID[index]), which = "both")
 
+index <- grep(pattern = ";.*INDUSTRY 4[^;]", x = M$ID, ignore.case = TRUE)
+M$ID[index] <- trimws(gsub(pattern = ";[^;]*INDUSTRY 4[^;]*",
+                           replacement = "", x = M$ID[index]), which = "both")
+index <- grep(pattern = ";.*INDUSTRIE 4[^;]", x = M$ID, ignore.case = TRUE)
+M$ID[index] <- trimws(gsub(pattern = ";[^;]*INDUSTRIE 4[^;]*",
+                           replacement = "", x = M$ID[index]), which = "both")
+# INDUSTRIAL INTERNET OF THINGS 
+index <- grep(pattern = "INDUSTRIAL INTERNET OF THINGS", x = M$ID, ignore.case = TRUE)
+M$ID[index] <- trimws(gsub(pattern = ";[^;]*INDUSTRIAL INTERNET OF THINGS[^;]*", ignore.case = TRUE,
+                           replacement = "", x = M$ID[index]), which = "both")
+index <- grep(pattern = "INDUSTRIAL IOT", x = M$ID, ignore.case = TRUE)
+M$ID[index] <- trimws(gsub(pattern = ";[^;]INDUSTRIAL IOT[^;]*", ignore.case = TRUE,
+                           replacement = "", x = M$ID[index]), which = "both")
+# business model
+index <- grep(pattern = "^[^;]*business model", x = M$ID, ignore.case = TRUE)
+M$ID[index] <- trimws(gsub(pattern = "^[^;]*business model[^;]*;", ignore.case = TRUE,
+                           replacement = "", x = M$ID[index]), which = "both")
+index <- grep(pattern = "business model", x = M$ID, ignore.case = TRUE)
+M$ID[index] <- trimws(gsub(pattern = ";[^;]*business model[^;]*", ignore.case = TRUE,
+                           replacement = "", x = M$ID[index]), which = "both")
+
+M$ID[index] <- trimws(gsub(pattern = ";[^;]*industrial revolution[^;]*", ignore.case = TRUE,
+                           replacement = "", x = M$ID[index]), which = "both")
+# INDUSTRIAL REVOLUTION
+index <- grep(pattern = "INDUSTRIAL REVOLUTION", x = M$ID, ignore.case = TRUE)
+M$ID[index] <- trimws(gsub(pattern = ";[^;]*INDUSTRIAL REVOLUTION[^;]*", ignore.case = TRUE,
+                           replacement = "", x = M$ID[index]), which = "both")
+
+# Unification of terms
+index <- grep(pattern = "INTERNET OF THING", x = M$ID, ignore.case = TRUE)
+M$ID[index] <- trimws(gsub(pattern = "[^;]*INTERNET OF THING[^;]*", ignore.case = TRUE,
+                           replacement = " INTERNET OF THINGS", x = M$ID[index[30]]), which = "both")
+
+# # Searching tool
+# index <- grep(pattern = "IOT", x = M$ID, ignore.case = TRUE)
+# M$ID[index]
+# # Visualisation of the terms extracted
+# lista <- trimws(unlist(strsplit(na.omit(M$ID), split = ";")), which = "both")
+# lista <- data.frame(table(lista))
 
 # Storing M into RData file 
 save(list = "M", file = paste(c("1_process/", directory, "_M.RData"), collapse = ""))
@@ -125,3 +174,6 @@ if (FALSE) {
   biblioshiny()
 }
 
+
+bm_cst <- conceptualStructure(M = bm, field = "AB", method = "CA", stemming = TRUE,
+                              minDegree=3, k.max = 5)
