@@ -108,8 +108,8 @@ rm(bm.wos)
 directory <- gsub(pattern = ".*\\\\([[:alnum:]]+)$", replacement = "\\1", x = directory)
 save.image(file = paste(c("1_process/", directory, "_image.RData"), collapse = ""))
 save(list = "bm", file = paste(c("1_process/", directory, "_bm.RData"), collapse = ""))
-# write.xlsx(x = bm, file = paste(c("1_process/", directory, "_bm.xlsx"), collapse = ""),
-#            sheetName="Sheet1", col.names=TRUE, row.names=TRUE, append=FALSE, showNA=FALSE)
+write.xlsx(x = bm, file = paste(c("1_process/", directory, "_bm.xlsx"), collapse = ""),
+           sheetName="Sheet1", col.names=TRUE, row.names=TRUE, append=FALSE, showNA=FALSE)
 
 # Adopting strategies
 M <- bm
