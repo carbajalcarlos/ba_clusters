@@ -1,6 +1,7 @@
 # ===== Loading required libraries =====
 require(bibliometrix)
 require(stringdist)
+require(openxlsx)
 
 # ===== Manual reading of the codes =====
 ## Selection of data folder
@@ -29,6 +30,7 @@ bm.wos <- convert2df(file = raw,dbsource = "isi", format = "bibtex")
 bm <- mergeDbSources(bm.sco, bm.wos, remove.duplicated = TRUE)
 ## Cleaning merged dataframe
 bm <- subset(x = bm, subset = PY < 2019)
+bm <- subset(x = bm, subset = DT == "ARTICLE" | DT == "CONFERENCE PAPER" | DT == "PROCEEDINGS PAPER")
 ## Removing items with missing data
 index <- is.na(bm$AU) # Missing authors
 bm <- bm[!index, ]
@@ -78,16 +80,48 @@ bm <- bm[-index, ]
 
 # ===== PRE-Analysis =====
 # Terms extraction
-bm.pre <- termExtraction(M = bm, Field = "TI", stemming = TRUE)
-bm.pre <- termExtraction(M = bm.pre, Field = "AB", stemming = TRUE)
-bm.pre <- termExtraction(M = bm.pre, Field = "DE", stemming = TRUE)
-bm.pre <- termExtraction(M = bm.pre, Field = "ID", stemming = TRUE)
+bm <- termExtraction(M = bm, Field = "TI", stemming = TRUE)
+bm <- termExtraction(M = bm, Field = "AB", stemming = TRUE)
+bm <- termExtraction(M = bm, Field = "DE", stemming = TRUE)
+bm <- termExtraction(M = bm, Field = "ID", stemming = TRUE)
 # Removing empty data in keywords
-index <- grep(pattern = "^NA$", x = bm.pre$DE_TM, ignore.case = TRUE)
-bm.pre$DE_TM[index] <- NA
-index <- grep(pattern = "^NA$", x = bm.pre$ID_TM, ignore.case = TRUE)
-bm.pre$DE_TM[index] <- NA
+index <- grep(pattern = "^NA$", x = bm$DE_TM, ignore.case = TRUE)
+bm$DE_TM[index] <- NA
+index <- grep(pattern = "^NA$", x = bm$ID_TM, ignore.case = TRUE)
+bm$DE_TM[index] <- NA
 
 ## Visualisation of the terms extracted
 # lista <- trimws(unlist(strsplit(na.omit(bm.pre$AB_TM), split = ";")), which = "both")
 # lista <- data.frame(table(lista))
+
+# ===== Closing project =====
+# Removing temporary objects
+rm(files)
+rm(raw)
+rm(i)
+rm(index)
+rm(comparison)
+rm(bm.sco)
+rm(bm.wos)
+
+# Storing data files
+directory <- gsub(pattern = ".*\\\\([[:alnum:]]+)$", replacement = "\\1", x = directory)
+save.image(file = paste(c("1_process/", directory, "_image.RData"), collapse = ""))
+save(list = "bm", file = paste(c("1_process/", directory, "_bm.RData"), collapse = ""))
+# write.xlsx(x = bm, file = paste(c("1_process/", directory, "_bm.xlsx"), collapse = ""),
+#            sheetName="Sheet1", col.names=TRUE, row.names=TRUE, append=FALSE, showNA=FALSE)
+
+# Adopting strategies
+M <- bm
+M$AB_RAW <- M$AB
+M$AB <- gsub(pattern = ";", replacement = " ", x = M$AB_TM)
+
+
+# Storing M into RData file 
+save(list = "M", file = paste(c("1_process/", directory, "_M.RData"), collapse = ""))
+
+#Working 
+if (FALSE) {
+  biblioshiny()
+}
+
